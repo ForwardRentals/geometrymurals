@@ -147,10 +147,16 @@
       fetch('https://formsubmit.co/ajax/' + f.dataset.to, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(data) })
         .then(function (r) { return r.json(); })
         .then(function (j) {
-          if (String(j.success) !== 'true') throw new Error('fail');
+          if (String(j.success) !== 'true') { console.warn('FormSubmit:', j); var er = new Error(j.message || 'fail'); er.fs = true; throw er; }
           msg.textContent = 'Thank you! Your message has been sent. We will be in touch soon.'; msg.hidden = false; f.reset(); btn.textContent = 'Sent';
         })
-        .catch(function () {
+        .catch(function (err) {
+          console.warn('Form error:', err);
+          if (err && err.fs && /activat/i.test(err.message)) {
+            msg.textContent = 'This form is still being activated and could not deliver your message yet. Please email ' + f.dataset.to + ' directly.'; msg.hidden = false;
+            btn.disabled = false; btn.textContent = 'Submit';
+            return;
+          }
           var body = ['Name: ' + data.name, 'Email: ' + data.email, '', data.message].join('\n');
           msg.textContent = 'Could not send automatically. Your email app should open instead; or email ' + f.dataset.to + ' directly.'; msg.hidden = false;
           btn.disabled = false; btn.textContent = 'Submit';
