@@ -9,10 +9,29 @@
 
   // sliders
   var lb = $('#lb'), lbImg = lb && $('img', lb), lbState = null;
-  function openLb(s, i) { lbState = { s: s, i: i }; show(); lb.classList.add('on'); }
+  var lbBar = null;
+  if (lb) { lbBar = document.createElement('div'); lbBar.className = 'lbbar'; lb.appendChild(lbBar); }
+  function openLb(s, i) {
+    lbState = { s: s, i: i };
+    lbBar.innerHTML = '';
+    s.imgs.forEach(function (im, k) {
+      var b = document.createElement('button');
+      b.setAttribute('aria-label', 'Image ' + (k + 1));
+      var t = document.createElement('img'); t.src = im.src; t.alt = ''; t.loading = 'lazy';
+      b.appendChild(t);
+      b.onclick = function (e) { e.stopPropagation(); lbState.i = k; show(); };
+      lbBar.appendChild(b);
+    });
+    lbBar.hidden = s.imgs.length < 2;
+    show(); lb.classList.add('on');
+  }
   function show() {
     var imgs = lbState.s.imgs;
     lbImg.src = imgs[lbState.i].src;
+    var bs = lbBar.children;
+    for (var k = 0; k < bs.length; k++) bs[k].classList.toggle('on', k === lbState.i);
+    var t = bs[lbState.i];
+    if (t) lbBar.scrollTo({ left: t.offsetLeft - lbBar.clientWidth / 2 + t.clientWidth / 2, behavior: 'smooth' });
   }
   function step(d) { var n = lbState.s.imgs.length; lbState.i = (lbState.i + d + n) % n; show(); }
   if (lb) {
