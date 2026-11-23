@@ -104,35 +104,6 @@
     var io2 = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('vis'); io2.unobserve(e.target); } }); }, { threshold: .12 });
     cf.forEach(function (n) { io2.observe(n); });
   } else { cf.forEach(function (n) { n.classList.add('vis'); }); }
-  var mc = $('.masonry');
-  if (mc) {
-    var mimgs = $$('img', mc);
-    var layout = function () {
-      var n = window.innerWidth <= 820 ? 2 : 4, gap = 6, cols = [], hs = [];
-      mc.innerHTML = ''; mc.classList.add('js');
-      for (var c = 0; c < n; c++) { var d = document.createElement('div'); d.className = 'mcol'; mc.appendChild(d); cols.push(d); hs.push(0); }
-      mimgs.forEach(function (im) {
-        var k = hs.indexOf(Math.min.apply(null, hs));
-        cols[k].appendChild(im);
-        hs[k] += (im.height || 1) / (im.width || 1);
-      });
-    };
-    mimgs.forEach(function (im) { im.setAttribute('data-w', im.getAttribute('width')); im.setAttribute('data-h', im.getAttribute('height')); });
-    var origLayout = layout;
-    layout = function () {
-      var n = window.innerWidth <= 820 ? 2 : 4, cols = [], hs = [];
-      mc.innerHTML = ''; mc.classList.add('js');
-      for (var c = 0; c < n; c++) { var d = document.createElement('div'); d.className = 'mcol'; mc.appendChild(d); cols.push(d); hs.push(0); }
-      mimgs.forEach(function (im) {
-        var k = hs.indexOf(Math.min.apply(null, hs));
-        cols[k].appendChild(im);
-        hs[k] += (+im.getAttribute('data-h')) / (+im.getAttribute('data-w'));
-      });
-    };
-    layout();
-    var lastN = window.innerWidth <= 820 ? 2 : 4;
-    window.addEventListener('resize', function () { var n = window.innerWidth <= 820 ? 2 : 4; if (n !== lastN) { lastN = n; layout(); } });
-  }
   var ms = $$('.masonry img');
   ms.forEach(function (im, k) { im.onclick = function () { openLb({ imgs: ms }, k); }; });
 
